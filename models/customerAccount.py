@@ -12,3 +12,6 @@ class CustomerAccount(Base):
     
     # One-to-one relationship with Customer
     customer: Mapped['Customer'] = relationship('Customer', back_populates='customer_account', lazy='select')
+    
+    # Many-to-many relationship with Role
+    roles: Mapped[list['Role']] = relationship('Role', secondary='customer_management_roles')

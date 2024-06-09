@@ -25,7 +25,7 @@ def save(customer_data):
 
 def find_all():
     query = select(Customer)
-    customers = db.engine.execute(query).scalars().all()
+    customers = db.session.execute(query).scalars().all()
     return customers
 
 def find_customer_by_gmail():

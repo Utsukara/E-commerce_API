@@ -14,4 +14,3 @@ class Order(Base):
     
     customer: Mapped['Customer'] = relationship('Customer', back_populates='orders')
     products: Mapped[List['Product']] = relationship('Product', secondary=order_product)
-

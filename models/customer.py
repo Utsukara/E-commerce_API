@@ -16,4 +16,3 @@ class Customer(Base):
     
     # One-to-many relationship with Order
     orders: Mapped[List['Order']] = relationship('Order', back_populates='customer')
-
