@@ -4,6 +4,7 @@ circuitbreaker==2.0.0
 click==8.1.7
 colorama==0.4.6
 Deprecated==1.2.14
+Faker==25.8.0
 Flask==3.0.3
 Flask-Caching==2.1.0
 Flask-Cors==4.0.1
@@ -25,8 +26,10 @@ ordered-set==4.1.0
 packaging==24.0
 Pygments==2.18.0
 PyJWT==2.8.0
+python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 rich==13.7.1
+six==1.16.0
 SQLAlchemy==2.0.30
 typing_extensions==4.11.0
 Werkzeug==3.0.3
