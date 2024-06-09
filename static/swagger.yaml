@@ -1,0 +1,741 @@
+swagger: '2.0'
+info:
+  title: 'E-commerce API'
+  description: 'API for an e-commerce application'
+  version: '1.0.0'
+host: '127.0.0.1:5000'
+schemes:
+  - 'http'
+consumes:
+  - 'application/json'
+produces:
+  - 'application/json'
+
+securityDefinitions:
+  bearerAuth:
+    type: apiKey
+    name: Authorization
+    in: header
+
+paths:
+  /login:
+    post:
+      tags:
+        - 'Authentication'
+      summary: 'Login to the application'
+      description: 'Login with username and password'
+      operationId: 'login'
+      parameters:
+        - in: 'body'
+          name: 'body'
+          description: 'Login credentials'
+          required: true
+          schema:
+            $ref: '#/definitions/LoginCredentials'
+      responses:
+        200:
+          description: 'Successful login'
+          schema:
+            $ref: '#/definitions/LoginResponse'
+          examples:
+            application/json:
+              status: 'success'
+              message: 'Successfully logged in.'
+              auth_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'
+        404:
+          description: 'Invalid username or password'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+          examples:
+            application/json:
+              status: 'Error'
+              message: 'Invalid username or password'
+  
+  /products:
+    get:
+      tags:
+        - 'Products'
+      summary: 'Get all products'
+      description: 'Retrieve a list of all products'
+      operationId: 'getProducts'
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: 'List of products'
+          schema:
+            type: 'array'
+            items:
+              $ref: '#/definitions/Product'
+          examples:
+            application/json:
+              - id: 1
+                name: 'Laptop'
+                price: 999.99
+              - id: 2
+                name: 'Smartphone'
+                price: 499.99
+
+    post:
+      tags:
+        - 'Products'
+      summary: 'Create a new product'
+      description: 'Add a new product to the catalog'
+      operationId: 'addProduct'
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: 'body'
+          name: 'body'
+          description: 'Product object to be added'
+          required: true
+          schema:
+            $ref: '#/definitions/Product'
+          examples:
+            application/json:
+              name: 'Tablet'
+              price: 299.99
+      responses:
+        201:
+          description: 'Product created successfully'
+          schema:
+            $ref: '#/definitions/Product'
+          examples:
+            application/json:
+              id: 3
+              name: 'Tablet'
+              price: 299.99
+        400:
+          description: 'Invalid input'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+          examples:
+            application/json:
+              status: 'Error'
+              message: 'Invalid product data'
+  
+  /products/{productId}:
+    get:
+      tags:
+        - 'Products'
+      summary: 'Get product by ID'
+      description: 'Retrieve a product by its ID'
+      operationId: 'getProductById'
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: 'path'
+          name: 'productId'
+          type: 'integer'
+          required: true
+          description: 'ID of the product to retrieve'
+      responses:
+        200:
+          description: 'Product details'
+          schema:
+            $ref: '#/definitions/Product'
+          examples:
+            application/json:
+              id: 1
+              name: 'Laptop'
+              price: 999.99
+        404:
+          description: 'Product not found'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+          examples:
+            application/json:
+              status: 'Error'
+              message: 'Product not found'
+    put:
+      tags:
+        - 'Products'
+      summary: 'Update a product'
+      description: 'Update the details of an existing product'
+      operationId: 'updateProduct'
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: 'path'
+          name: 'productId'
+          type: 'integer'
+          required: true
+          description: 'ID of the product to update'
+        - in: 'body'
+          name: 'body'
+          description: 'Updated product object'
+          required: true
+          schema:
+            $ref: '#/definitions/Product'
+          examples:
+            application/json:
+              name: 'Laptop Pro'
+              price: 1299.99
+      responses:
+        200:
+          description: 'Product updated successfully'
+          schema:
+            $ref: '#/definitions/Product'
+          examples:
+            application/json:
+              id: 1
+              name: 'Laptop Pro'
+              price: 1299.99
+        404:
+          description: 'Product not found'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+          examples:
+            application/json:
+              status: 'Error'
+              message: 'Product not found'
+        400:
+          description: 'Invalid input'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+          examples:
+            application/json:
+              status: 'Error'
+              message: 'Invalid product data'
+    delete:
+      tags:
+        - 'Products'
+      summary: 'Delete a product'
+      description: 'Delete a product by its ID'
+      operationId: 'deleteProduct'
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: 'path'
+          name: 'productId'
+          type: 'integer'
+          required: true
+          description: 'ID of the product to delete'
+      responses:
+        204:
+          description: 'Product deleted successfully'
+        404:
+          description: 'Product not found'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+          examples:
+            application/json:
+              status: 'Error'
+              message: 'Product not found'
+  
+  /orders:
+    get:
+      tags:
+        - 'Orders'
+      summary: 'Get all orders'
+      description: 'Retrieve a list of all orders'
+      operationId: 'getOrders'
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: 'List of orders'
+          schema:
+            type: 'array'
+            items:
+              $ref: '#/definitions/Order'
+          examples:
+            application/json:
+              - id: 1
+                order_date: '2023-06-01'
+                customer_id: 1
+                products:
+                  - id: 1
+                    name: 'Laptop'
+                    price: 999.99
+                  - id: 2
+                    name: 'Smartphone'
+                    price: 499.99
+
+    post:
+      tags:
+        - 'Orders'
+      summary: 'Create a new order'
+      description: 'Create a new order'
+      operationId: 'createOrder'
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: 'body'
+          name: 'body'
+          description: 'Order object to be created'
+          required: true
+          schema:
+            $ref: '#/definitions/Order'
+          examples:
+            application/json:
+              order_date: '2023-06-01'
+              customer_id: 1
+              products:
+                - id: 1
+                  name: 'Laptop'
+                  price: 999.99
+                - id: 2
+                  name: 'Smartphone'
+                  price: 499.99
+      responses:
+        201:
+          description: 'Order created successfully'
+          schema:
+            $ref: '#/definitions/Order'
+          examples:
+            application/json:
+              id: 2
+              order_date: '2023-06-02'
+              customer_id: 1
+              products:
+                - id: 3
+                  name: 'Tablet'
+                  price: 299.99
+        400:
+          description: 'Invalid input'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+          examples:
+            application/json:
+              status: 'Error'
+              message: 'Invalid order data'
+  
+  /orders/{orderId}:
+    get:
+      tags:
+        - 'Orders'
+      summary: 'Get order by ID'
+      description: 'Retrieve an order by its ID'
+      operationId: 'getOrderById'
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: 'path'
+          name: 'orderId'
+          type: 'integer'
+          required: true
+          description: 'ID of the order to retrieve'
+      responses:
+        200:
+          description: 'Order details'
+          schema:
+            $ref: '#/definitions/Order'
+          examples:
+            application/json:
+              id: 1
+              order_date: '2023-06-01'
+              customer_id: 1
+              products:
+                - id: 1
+                  name: 'Laptop'
+                  price: 999.99
+                - id: 2
+                  name: 'Smartphone'
+                  price: 499.99
+        404:
+          description: 'Order not found'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+          examples:
+            application/json:
+              status: 'Error'
+              message: 'Order not found'
+    put:
+      tags:
+        - 'Orders'
+      summary: 'Update an order'
+      description: 'Update the details of an existing order'
+      operationId: 'updateOrder'
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: 'path'
+          name: 'orderId'
+          type: 'integer'
+          required: true
+          description: 'ID of the order to update'
+        - in: 'body'
+          name: 'body'
+          description: 'Updated order object'
+          required: true
+          schema:
+            $ref: '#/definitions/Order'
+          examples:
+            application/json:
+              order_date: '2023-06-01'
+              customer_id: 1
+              products:
+                - id: 1
+                  name: 'Laptop Pro'
+                  price: 1299.99
+      responses:
+        200:
+          description: 'Order updated successfully'
+          schema:
+            $ref: '#/definitions/Order'
+          examples:
+            application/json:
+              id: 1
+              order_date: '2023-06-01'
+              customer_id: 1
+              products:
+                - id: 1
+                  name: 'Laptop Pro'
+                  price: 1299.99
+        404:
+          description: 'Order not found'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+          examples:
+            application/json:
+              status: 'Error'
+              message: 'Order not found'
+        400:
+          description: 'Invalid input'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+          examples:
+            application/json:
+              status: 'Error'
+              message: 'Invalid order data'
+    delete:
+      tags:
+        - 'Orders'
+      summary: 'Delete an order'
+      description: 'Delete an order by its ID'
+      operationId: 'deleteOrder'
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: 'path'
+          name: 'orderId'
+          type: 'integer'
+          required: true
+          description: 'ID of the order to delete'
+      responses:
+        204:
+          description: 'Order deleted successfully'
+        404:
+          description: 'Order not found'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+          examples:
+            application/json:
+              status: 'Error'
+              message: 'Order not found'
+
+  /customers:
+    get:
+      tags:
+        - 'Customers'
+      summary: 'Get all customers'
+      description: 'Retrieve a list of all customers'
+      operationId: 'getCustomers'
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: 'List of customers'
+          schema:
+            type: 'array'
+            items:
+              $ref: '#/definitions/Customer'
+          examples:
+            application/json:
+              - id: 1
+                name: 'John Doe'
+                email: 'john.doe@example.com'
+                phone: '123-456-7890'
+              - id: 2
+                name: 'Jane Smith'
+                email: 'jane.smith@example.com'
+                phone: '987-654-3210'
+
+    post:
+      tags:
+        - 'Customers'
+      summary: 'Create a new customer'
+      description: 'Add a new customer to the system'
+      operationId: 'addCustomer'
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: 'body'
+          name: 'body'
+          description: 'Customer object to be added'
+          required: true
+          schema:
+            $ref: '#/definitions/Customer'
+          examples:
+            application/json:
+              name: 'Alice Johnson'
+              email: 'alice.johnson@example.com'
+              phone: '123-123-1234'
+      responses:
+        201:
+          description: 'Customer created successfully'
+          schema:
+            $ref: '#/definitions/Customer'
+          examples:
+            application/json:
+              id: 3
+              name: 'Alice Johnson'
+              email: 'alice.johnson@example.com'
+              phone: '123-123-1234'
+        400:
+          description: 'Invalid input'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+          examples:
+            application/json:
+              status: 'Error'
+              message: 'Invalid customer data'
+  
+  /customers/{customerId}:
+    get:
+      tags:
+        - 'Customers'
+      summary: 'Get customer by ID'
+      description: 'Retrieve a customer by their ID'
+      operationId: 'getCustomerById'
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: 'path'
+          name: 'customerId'
+          type: 'integer'
+          required: true
+          description: 'ID of the customer to retrieve'
+      responses:
+        200:
+          description: 'Customer details'
+          schema:
+            $ref: '#/definitions/Customer'
+          examples:
+            application/json:
+              id: 1
+              name: 'John Doe'
+              email: 'john.doe@example.com'
+              phone: '123-456-7890'
+        404:
+          description: 'Customer not found'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+          examples:
+            application/json:
+              status: 'Error'
+              message: 'Customer not found'
+    put:
+      tags:
+        - 'Customers'
+      summary: 'Update a customer'
+      description: 'Update the details of an existing customer'
+      operationId: 'updateCustomer'
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: 'path'
+          name: 'customerId'
+          type: 'integer'
+          required: true
+          description: 'ID of the customer to update'
+        - in: 'body'
+          name: 'body'
+          description: 'Updated customer object'
+          required: true
+          schema:
+            $ref: '#/definitions/Customer'
+          examples:
+            application/json:
+              name: 'John Doe'
+              email: 'john.new@example.com'
+              phone: '123-456-7890'
+      responses:
+        200:
+          description: 'Customer updated successfully'
+          schema:
+            $ref: '#/definitions/Customer'
+          examples:
+            application/json:
+              id: 1
+              name: 'John Doe'
+              email: 'john.new@example.com'
+              phone: '123-456-7890'
+        404:
+          description: 'Customer not found'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+          examples:
+            application/json:
+              status: 'Error'
+              message: 'Customer not found'
+        400:
+          description: 'Invalid input'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+          examples:
+            application/json:
+              status: 'Error'
+              message: 'Invalid customer data'
+    delete:
+      tags:
+        - 'Customers'
+      summary: 'Delete a customer'
+      description: 'Delete a customer by their ID'
+      operationId: 'deleteCustomer'
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: 'path'
+          name: 'customerId'
+          type: 'integer'
+          required: true
+          description: 'ID of the customer to delete'
+      responses:
+        204:
+          description: 'Customer deleted successfully'
+        404:
+          description: 'Customer not found'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+          examples:
+            application/json:
+              status: 'Error'
+              message: 'Customer not found'
+
+definitions:
+  LoginCredentials:
+    type: 'object'
+    properties:
+      username:
+        type: 'string'
+        description: 'Username'
+      password:
+        type: 'string'
+        format: 'password'
+        description: 'Password'
+    required:
+      - 'username'
+      - 'password'
+  
+  LoginResponse:
+    type: 'object'
+    properties:
+      status:
+        type: 'string'
+        description: 'Status of the login attempt'
+      message:
+        type: 'string'
+        description: 'Message about the login attempt'
+      auth_token:
+        type: 'string'
+        description: 'Authentication token'
+    required:
+      - 'status'
+      - 'message'
+      - 'auth_token'
+  
+  ErrorResponse:
+    type: 'object'
+    properties:
+      status:
+        type: 'string'
+        description: 'Error status'
+      message:
+        type: 'string'
+        description: 'Error message'
+    required:
+      - 'status'
+      - 'message'
+
+  Product:
+    type: 'object'
+    properties:
+      id:
+        type: 'integer'
+        description: 'Product ID'
+      name:
+        type: 'string'
+        description: 'Product name'
+      price:
+        type: 'number'
+        format: 'float'
+        description: 'Product price'
+    required:
+      - 'name'
+      - 'price'
+
+  Order:
+    type: 'object'
+    properties:
+      id:
+        type: 'integer'
+        description: 'Order ID'
+      order_date:
+        type: 'string'
+        format: 'date'
+        description: 'Order date'
+      customer_id:
+        type: 'integer'
+        description: 'ID of the customer who placed the order'
+      products:
+        type: 'array'
+        items:
+          $ref: '#/definitions/Product'
+    required:
+      - 'order_date'
+      - 'customer_id'
+
+  Customer:
+    type: 'object'
+    properties:
+      id:
+        type: 'integer'
+        description: 'Customer ID'
+      name:
+        type: 'string'
+        description: 'Customer name'
+      email:
+        type: 'string'
+        description: 'Customer email'
+      phone:
+        type: 'string'
+        description: 'Customer phone'
+      customer_account:
+        $ref: '#/definitions/CustomerAccount'
+    required:
+      - 'name'
+      - 'email'
+  
+  CustomerAccount:
+    type: 'object'
+    properties:
+      id:
+        type: 'integer'
+        description: 'CustomerAccount ID'
+      username:
+        type: 'string'
+        description: 'Username for the customer account'
+      password:
+        type: 'string'
+        description: 'Password for the customer account'
+      customer_id:
+        type: 'integer'
+        description: 'ID of the customer'
+    required:
+      - 'username'
+      - 'password'
+      - 'customer_id'
+  
+  Role:
+    type: 'object'
+    properties:
+      id:
+        type: 'integer'
+        description: 'Role ID'
+      role_name:
+        type: 'string'
+        description: 'Role name'
+    required:
+      - 'role_name'

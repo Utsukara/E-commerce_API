@@ -21,6 +21,18 @@ from routes.customerBP import customer_blueprint
 from routes.orderBP import order_blueprint
 from routes.productBP import product_blueprint
 from routes.customerAccountBP import customer_account_blueprint
+from flask_swagger_ui import get_swaggerui_blueprint
+
+SWAGGER_URL = '/api/docs'
+API_URL = '/static/swagger.yaml'
+
+swaggerui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={
+        'app_name': "E-Commerce API"
+    }
+)
 
 def create_app(config_name):
     app = Flask(__name__)
@@ -39,6 +51,7 @@ def configure_blueprints(app):
     app.register_blueprint(order_blueprint, url_prefix='/orders')
     app.register_blueprint(product_blueprint, url_prefix='/products')
     app.register_blueprint(customer_account_blueprint, url_prefix='/accounts')
+    app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 def configure_rate_limiter(app):
     limiter.limit("100 per minute")(customer_blueprint)
